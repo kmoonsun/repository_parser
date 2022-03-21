@@ -1,7 +1,6 @@
 #!/bin/sh
 
-repository_url="https://github.com/kmoonsun/repository_parser"
-toekn="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"
+repository_url="git@github.com:kmoonsun/repository_parser.git"
 
 git add -A
 git status
