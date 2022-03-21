@@ -7,7 +7,5 @@ git add -A
 git status
 git commit -m "auto icommit"
 
-git push $repository main
-echo "kmoonsun"
-echo $token
+git push $repository_url main
 
