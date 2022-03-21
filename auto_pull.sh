@@ -5,6 +5,9 @@ toekn="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"
 
 git add -A
 git status
-git commit -m 'auto commit'
+git commit -m "auto icommit"
 
 git push $repository main
+echo "kmoonsun"
+echo $token
+
