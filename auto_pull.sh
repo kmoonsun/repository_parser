@@ -7,4 +7,4 @@ git add -A
 git status
 git commit -m 'auto commit'
 
-git push $repository +main
+git push $repository main
