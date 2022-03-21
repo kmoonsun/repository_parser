@@ -8,6 +8,3 @@ git status
 git commit -m "auto icommit"
 
 git push $repository_url main
-
-echo "kmoonsun"
-echo $token
