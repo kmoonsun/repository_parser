@@ -7,11 +7,12 @@ class Parser:
         self.keyworkd_set = json.loads(open(KEYWORD_SET,'r').read())
 
     def c_comment_parser(self, source):
-        regrex = r'(//[^\n]*|/\*.*?\*/)'
-        comments = re.findall(regrex, source, re.MULTILINE | re.DOTALL)
-        output = [i for i in comments]
+        # parse comment
+        comment = re.findall(r'(//[^\n]*|/\*.*?\*/)', source, re.MULTILINE | re.DOTALL)
+        # parse text
+        text = [re.sub('^[/]|[/*]', '', i).replace('\t', '')  for i in comment]
 
-        return output
+        return text
 
     def shell_comment_parser(self, source):
         pass
@@ -37,7 +38,7 @@ def main():
 
     print()
     for idx, i in enumerate(blocks):
-        print(idx, i)
+        print(i)
 
     #print(source)
     print()
@@ -45,4 +46,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
