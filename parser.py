@@ -9,7 +9,9 @@ class Parser:
     def c_comment_parser(self, source):
         regrex = r'(//[^\n]*|/\*.*?\*/)'
         comments = re.findall(regrex, source, re.MULTILINE | re.DOTALL)
-        return comments
+        output = [i for i in comments]
+
+        return output
 
     def shell_comment_parser(self, source):
         pass
@@ -34,13 +36,13 @@ def main():
     blocks = parser.c_comment_parser(source)
 
     print()
-    for i in blocks:
-        print(i)
+    for idx, i in enumerate(blocks):
+        print(idx, i)
 
     #print(source)
-
     print()
 
 
 if __name__ == '__main__':
     main()
+
