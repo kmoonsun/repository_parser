@@ -3,10 +3,10 @@ import sys
 import json
 import re
 import itertools
-import numpy as np
+import pandas as pd
 
 KEYWORD_SET = './keywords.json'
-SPDX_LICENSES = ''
+SPDX_LICENSES = '/home/moonsun/spdx_project/spdx_license/'
 
 class Parser:
     def __init__(self):
@@ -19,8 +19,26 @@ class Parser:
         text = list(filter(None, [re.sub(r'\"(.*?)\"|\'(.*?)\'|[/*]|[\t\n]|  ', '', i).strip() for i in comment]))
         return text
 
-    def spdx_license_loader(self, spdx):
+    def spdx_license_loader(self, path=SPDX_LICENSES):
+        license_list = list()
+    
+        for license in os.listdir(path):
+            read = json.load(open(path+license, 'r'))
+
+            template = dict()
+            elems = ['licenseId', 'name', 'licenseText', 'standardLicenseHeader']
+            for tag in elems:
+                try:
+                    template[tag] = re.sub(r'\s\s+', ' ', read[tag]).replace('\n','')
+                except:
+                    template[tag] = None
+            license_list.append(template)
+        
+        return license_list
+
+    def gen_spdx_license_database(self):
         pass
+
 
 class Tokenizer:
     def __init__(self):
@@ -96,13 +114,14 @@ def main():
     parser = Parser()
     blocks = parser.c_comment_parser(source)
 
+    output = parser.spdx_license_loader()
+    print()
+
     tokenizer = Tokenizer()
     grams = tokenizer.get_grams(blocks)
 
     token_compare = TokenComapre()
     lcs_score = token_compare.lcs_similarity(grams, grams)
-
-    print(lcs_score)
 
 
 
