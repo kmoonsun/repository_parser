@@ -4,9 +4,12 @@ import json
 import re
 import itertools
 import pandas as pd
+from tokenizer import *
 
+sys.path.append('/home/moonsun/spdx_project')
 KEYWORD_SET = './keywords.json'
 SPDX_LICENSES = '/home/moonsun/spdx_project/spdx_license/'
+SPDX_LICENSES_GRAMS = '/home/moonsun/spdx_project/spdx_license_data_grams.csv'
 
 class Parser:
     def __init__(self):
@@ -26,9 +29,10 @@ class Parser:
             read = json.load(open(path+license, 'r'))
 
             template = dict()
-            elems = ['licenseId', 'name', 'licenseText', 'standardLicenseHeader']
-            for tag in elems:
+            tags = ['licenseId', 'name', 'licenseText', 'standardLicenseHeader']
+            for tag in tags:
                 try:
+                    # remove whitespace and \n (2 more)
                     template[tag] = re.sub(r'\s\s+', ' ', read[tag]).replace('\n','')
                 except:
                     template[tag] = None
@@ -36,27 +40,29 @@ class Parser:
         
         return license_list
 
-    def gen_spdx_license_database(self):
-        pass
+    def spdx_license_database_generator(self):
+        tokenizer = Tokenizer()
+        spdx_license = self.spdx_license_loader()
 
-
-class Tokenizer:
-    def __init__(self):
-        pass
-
-    def get_grams(self, comments):
-        grams = list()
-        for comment in comments:
-            # remove whitespace (2 more)
-            comment = re.sub(r'\s\s+', ' ', comment)
-            words = comment.split(' ')
-            grams.extend(list(zip(words, words[1:])))
+        license_grams = list()
+        for i in spdx_license[0:1]:
+            template = i
+            license_text = i['licenseText']
+            license_header = i['standardLicenseHeader']
+            if license_text != None:
+                    template['licenseText'] = tokenizer.get_grams_from_license(license_text.split(' '))
+            if license_header != None:
+                 template['standardLicenseHeader']  = tokenizer.get_grams_from_license(license_header.split(' '))
+            
+            license_grams.append(template)
         
-        return grams
+        pd.DataFrame(license_grams).transpose().to_csv('spdx_license_data_grams.csv', header=None)
+ 
 
-class TokenComapre:
+class TokenComapre: 
     def __init__(self):
-        pass
+        self.spdx_license_gram = json.load(open(SPDX_LICENSES_GRAMS, 'r').read())
+        print(self.spdx_license_gram)
 
     def lcs_lens(self, xs, ys):
         curr = list(itertools.repeat(0, 1 + len(ys)))
@@ -114,11 +120,12 @@ def main():
     parser = Parser()
     blocks = parser.c_comment_parser(source)
 
-    output = parser.spdx_license_loader()
-    print()
+    token_compare = TokenComapre()
+    
 
+    exit()
     tokenizer = Tokenizer()
-    grams = tokenizer.get_grams(blocks)
+    grams = tokenizer.get_grams_from_source(blocks)
 
     token_compare = TokenComapre()
     lcs_score = token_compare.lcs_similarity(grams, grams)
