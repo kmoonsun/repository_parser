@@ -1,3 +1,4 @@
+from operator import index
 import os
 import sys
 import json
@@ -9,7 +10,7 @@ from tokenizer import *
 sys.path.append('/home/moonsun/spdx_project')
 KEYWORD_SET = './keywords.json'
 SPDX_LICENSES = '/home/moonsun/spdx_project/spdx_license/'
-SPDX_LICENSES_GRAMS = '/home/moonsun/spdx_project/spdx_license_data_grams.csv'
+SPDX_LICENSES_GRAMS = '/home/moonsun/spdx_project/spdx_license_data_grams.json'
 
 class Parser:
     def __init__(self):
@@ -56,14 +57,16 @@ class Parser:
             
             license_grams.append(template)
         
-        pd.DataFrame(license_grams).transpose().to_csv('spdx_license_data_grams.csv', header=None)
+        #pd.DataFrame(license_grams).to_json('spdx_license_data_grams.json')
+        with open('spdx_license_data_grams.json', 'w') as f:
+            json.dump(license_grams, f)
  
 
 class TokenComapre: 
     def __init__(self):
-        self.spdx_license_gram = json.load(open(SPDX_LICENSES_GRAMS, 'r').read())
-        print(self.spdx_license_gram)
-
+        self.spdx_license_gram = json.loads(open(SPDX_LICENSES_GRAMS,'r').read())[0]
+        print(self.spdx_license_gram['licenseText'])
+        # 현재 tuple로 안되어 있는데, 비교 잘되나 확인하고 전체 spdxlincese 덤프한 뒤, 구름 라이선스 정보 식별해보기
     def lcs_lens(self, xs, ys):
         curr = list(itertools.repeat(0, 1 + len(ys)))
         for x in xs:
@@ -119,16 +122,16 @@ def main():
 
     parser = Parser()
     blocks = parser.c_comment_parser(source)
-
-    token_compare = TokenComapre()
+    #parser.spdx_license_database_generator()
     
+    #token_compare = TokenComapre()
+   
 
-    exit()
     tokenizer = Tokenizer()
-    grams = tokenizer.get_grams_from_source(blocks)
+    #grams = tokenizer.get_grams_from_source(blocks)
 
     token_compare = TokenComapre()
-    lcs_score = token_compare.lcs_similarity(grams, grams)
+    #lcs_score = token_compare.lcs_similarity(grams, grams)
 
 
 
