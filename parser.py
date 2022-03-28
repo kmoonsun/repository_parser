@@ -25,8 +25,9 @@ class Parser:
 
     def spdx_license_loader(self, path=SPDX_LICENSES):
         license_list = list()
-    
         for license in os.listdir(path):
+            print(license)
+
             read = json.load(open(path+license, 'r'))
 
             template = dict()
@@ -41,12 +42,12 @@ class Parser:
         
         return license_list
 
-    def spdx_license_database_generator(self):
+    def spdx_license_database_generator(self, license_file_path=SPDX_LICENSES):
         tokenizer = Tokenizer()
-        spdx_license = self.spdx_license_loader()
+        spdx_license = self.spdx_license_loader(license_file_path)
 
         license_grams = list()
-        for i in spdx_license[0:1]:
+        for i in spdx_license:
             template = i
             license_text = i['licenseText']
             license_header = i['standardLicenseHeader']
@@ -60,50 +61,6 @@ class Parser:
         #pd.DataFrame(license_grams).to_json('spdx_license_data_grams.json')
         with open('spdx_license_data_grams.json', 'w') as f:
             json.dump(license_grams, f)
- 
-
-class TokenComapre: 
-    def __init__(self):
-        self.spdx_license_gram = json.loads(open(SPDX_LICENSES_GRAMS,'r').read())[0]
-        print(self.spdx_license_gram['licenseText'])
-        # 현재 tuple로 안되어 있는데, 비교 잘되나 확인하고 전체 spdxlincese 덤프한 뒤, 구름 라이선스 정보 식별해보기
-    def lcs_lens(self, xs, ys):
-        curr = list(itertools.repeat(0, 1 + len(ys)))
-        for x in xs:
-            prev = list(curr)
-            for i, y in enumerate(ys):
-                if x == y:
-                    curr[i + 1] = prev[i] + 1
-                else:
-                    curr[i + 1] = max(curr[i], prev[i + 1])
-        return curr
-
-    def lcs(self, xs, ys):
-        nx, ny = len(xs), len(ys)
-        if nx == 0:
-            return []
-        elif nx == 1:
-            return [xs[0]] if xs[0] in ys else []
-        else:
-            i = nx // 2
-            xb, xe = xs[:i], xs[i:]
-            ll_b = self.lcs_lens(xb, ys)
-            ll_e = self.lcs_lens(xe[::-1], ys[::-1])
-            _, k = max((ll_b[j] + ll_e[ny - j], j)
-                        for j in range(ny + 1))
-            yb, ye = ys[:k], ys[k:]
-
-            return self.lcs(xb, yb) + self.lcs(xe, ye)
-
-    def lcs_similarity(self, xs, ys):
-        output = self.lcs(xs, ys)
-
-        try:
-            simularity = len(output) / max(len(xs), len(ys))
-        except:
-            simularity = 0
-
-        return simularity
 
 def main():
     root_directory = sys.argv[1]
@@ -119,21 +76,6 @@ def main():
 
     with open(file_list[1], 'r') as fp:
         source = fp.read()
-
-    parser = Parser()
-    blocks = parser.c_comment_parser(source)
-    #parser.spdx_license_database_generator()
-    
-    #token_compare = TokenComapre()
-   
-
-    tokenizer = Tokenizer()
-    #grams = tokenizer.get_grams_from_source(blocks)
-
-    token_compare = TokenComapre()
-    #lcs_score = token_compare.lcs_similarity(grams, grams)
-
-
 
 if __name__ == '__main__':
     main()
