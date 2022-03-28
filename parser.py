@@ -24,7 +24,6 @@ class Parser:
         return text
 
     def source_code_path_loader(self, root_path=None):
-       
         if root_path == None:
             exit('[!] file not found.')
         print(root_path)
@@ -53,7 +52,7 @@ class Parser:
                     template[tag] = re.sub(r'\s\s+', ' ', read[tag]).replace('\n','')
                 except:
                     template[tag] = None
-            license_list.append(template)
+            license_list.append({template['licenseId'] : template})
         
         return license_list
 
@@ -66,12 +65,13 @@ class Parser:
         for index, i in enumerate(spdx_license):
             print(f'\r\t=> {index}/{length}', end='', flush=True)
             template = i
-            license_text = i['licenseText']
-            license_header = i['standardLicenseHeader']
+            key = list(i.keys())[0]
+            license_text = i[key]['licenseText']
+            license_header = i[key]['standardLicenseHeader']
             if license_text != None:
-                    template['licenseText'] = tokenizer.get_grams_from_license(license_text.split(' '))
+                    template['licenseTextGram'] = tokenizer.get_grams_from_license(license_text.split(' '))
             if license_header != None:
-                 template['standardLicenseHeader']  = tokenizer.get_grams_from_license(license_header.split(' '))
+                 template['standardLicenseHeaderGram']  = tokenizer.get_grams_from_license(license_header.split(' '))
             
             license_grams.append(template)
 
@@ -79,9 +79,7 @@ class Parser:
         print('\n[+] Save as "{f}"...'.format(f=file_name))
         with open(file_name, 'w') as f:
             json.dump(license_grams, f)
-
         return file_name
-
 
 def main():
     root_directory = sys.argv[1]
@@ -107,8 +105,6 @@ def main():
     token_compare = TokenComapre()
     lcs_score = token_compare.lcs_similarity(grams, token_compare.spdx_license_gram)
     print(lcs_score)
-
-
 
 if __name__ == '__main__':
     main()

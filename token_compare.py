@@ -5,7 +5,7 @@ SPDX_LICENSES_GRAMS = '/home/moonsun/spdx_project/spdx_license_data_grams.json'
 
 class TokenComapre: 
     def __init__(self):
-        self.spdx_license_gram = json.loads(open(SPDX_LICENSES_GRAMS,'r').read())[0]
+        pass
     
     def lcs_lens(self, xs, ys):
         length = list(itertools.repeat(0, 1 + len(ys)))
@@ -17,7 +17,7 @@ class TokenComapre:
                 else:
                     length[i + 1] = max(length[i], prev[i + 1])
         return length
-        
+
 
     def lcs(self, xs, ys):
         nx, ny = len(xs), len(ys)
