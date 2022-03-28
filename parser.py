@@ -23,11 +23,26 @@ class Parser:
         text = list(filter(None, [re.sub(r'\"(.*?)\"|\'(.*?)\'|[/*]|[\t\n]|  ', '', i).strip() for i in comment]))
         return text
 
+    def source_code_path_loader(self, root_path=None):
+       
+        if root_path == None:
+            exit('[!] file not found.')
+        print(root_path)
+        file_pathes = list()
+        for root, dirs, files in os.walk(root_path):
+            for file in files:
+                ext = os.path.splitext(file)[-1].split('.')[-1]
+                # 추후 exe 감지에 사용
+                item = {'path' : root + '/' + file,
+                        'ext' : ext
+                }
+                file_pathes.append(root+'/'+file)    
+
+        return file_pathes
+
     def spdx_license_loader(self, path=SPDX_LICENSES):
         license_list = list()
         for license in os.listdir(path):
-            print(license)
-
             read = json.load(open(path+license, 'r'))
 
             template = dict()
@@ -45,9 +60,11 @@ class Parser:
     def spdx_license_database_generator(self, license_file_path=SPDX_LICENSES):
         tokenizer = Tokenizer()
         spdx_license = self.spdx_license_loader(license_file_path)
+        length = len(spdx_license)
 
         license_grams = list()
-        for i in spdx_license:
+        for index, i in enumerate(spdx_license):
+            print(f'\r\t=> {index}/{length}', end='', flush=True)
             template = i
             license_text = i['licenseText']
             license_header = i['standardLicenseHeader']
@@ -57,10 +74,14 @@ class Parser:
                  template['standardLicenseHeader']  = tokenizer.get_grams_from_license(license_header.split(' '))
             
             license_grams.append(template)
-        
-        #pd.DataFrame(license_grams).to_json('spdx_license_data_grams.json')
-        with open('spdx_license_data_grams.json', 'w') as f:
+
+        file_name = 'spdx_license_data_grams.json'
+        print('\n[+] Save as "{f}"...'.format(f=file_name))
+        with open(file_name, 'w') as f:
             json.dump(license_grams, f)
+
+        return file_name
+
 
 def main():
     root_directory = sys.argv[1]
@@ -76,6 +97,18 @@ def main():
 
     with open(file_list[1], 'r') as fp:
         source = fp.read()
+
+    parser = Parser()
+    blocks = parser.c_comment_parser(source)
+    #parser.spdx_license_database_generator()
+    tokenizer = Tokenizer()
+    grams = tokenizer.get_grams_from_source(blocks)
+
+    token_compare = TokenComapre()
+    lcs_score = token_compare.lcs_similarity(grams, token_compare.spdx_license_gram)
+    print(lcs_score)
+
+
 
 if __name__ == '__main__':
     main()
