@@ -20,12 +20,12 @@ args = arg_parser.parse_args()
 # spdx 라이선스에서 ngram 데이터베이스 생성
 if args.db != None:
     print('[+] Generate license database.')
-    try:
+    #try:
         # config 파일에 저장된 파일 경로 받도록 하자.
-        parser = Parser()
-        parser.spdx_license_database_generator()
-    except:
-        exit('\n[!] check license database.')
+    parser = Parser()
+    parser.spdx_license_database_generator()
+    #except:
+    #    exit('\n[!] check license database.')
     print('[+] Done.')
 
 
@@ -79,6 +79,7 @@ elif args.find != None:
             
         # Compare source code N-gram and spdx license database
         compare = TokenComapre()
+
         '''
         "licenseId": "TU-Berlin-1.0",
         "name": "Technische Universitaet Berlin License 1.0",
@@ -94,10 +95,10 @@ elif args.find != None:
             
             # key[0] : spdx_license_id
 
-
             # text 검증
             # standard 검증
         '''
+
     print('[+] Done.')
     print(report_spdx_license)
     print('--------')

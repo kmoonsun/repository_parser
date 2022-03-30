@@ -62,23 +62,30 @@ class Parser:
         length = len(spdx_license)
 
         license_grams = list()
-        for index, i in enumerate(spdx_license):
-            print(f'\r\t=> {index}/{length}', end='', flush=True)
-            template = i
-            key = list(i.keys())[0]
-            license_text = i[key]['licenseText']
-            license_header = i[key]['standardLicenseHeader']
+        for index, license in enumerate(spdx_license):
+            print(f'\r\t=> {index+1}/{length}', end='', flush=True)
+
+            template = license
+            license_id = list(license.keys())[0]
+            license_text = license[license_id]['licenseText']
+            license_header = license[license_id]['standardLicenseHeader']
+
             if license_text != None:
-                    template['licenseTextGram'] = tokenizer.get_grams_from_license(license_text.split(' '))
+                    template[license_id]['licenseTextGram'] = tokenizer.get_grams_from_license(license_text.split(' '))
+            else:
+                 template[license_id]['licenseTextGram'] = None
             if license_header != None:
-                 template['standardLicenseHeaderGram']  = tokenizer.get_grams_from_license(license_header.split(' '))
-            
+                 template[license_id]['standardLicenseHeaderGram']  = tokenizer.get_grams_from_license(license_header.split(' '))
+            else:
+                template[license_id]['standardLicenseHeaderGram'] = None
+
             license_grams.append(template)
 
         file_name = 'spdx_license_data_grams.json'
         print('\n[+] Save as "{f}"...'.format(f=file_name))
         with open(file_name, 'w') as f:
             json.dump(license_grams, f)
+
         return file_name
 
 def main():
