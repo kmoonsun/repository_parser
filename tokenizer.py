@@ -5,8 +5,8 @@ class Tokenizer:
         pass
 
     def get_grams_from_source(self, comments):
-        grams = list() # plain text (splited by whitespace)
-        words = list() # 2-gram tuple
+        grams = list() # 2-gram tuple
+        words = list() # plain text (splited by whitespace)
         for comment in comments:
             # remove whitespace (2 more)
             comment = re.sub(r'\s\s+', ' ', comment)
